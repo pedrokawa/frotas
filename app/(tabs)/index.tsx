@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Alert, Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Sidebar from '@/components/sidebar';
+import { useRouter } from 'expo-router';
 
 export default function Home() {
   const [sidebarAberta, setSidebarAberta] = useState(false);
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
-      Botão sanduíche
       {/* <TouchableOpacity
         style={styles.menuBotao}
         onPress={() => setSidebarAberta(true)}
@@ -17,9 +18,10 @@ export default function Home() {
         <View style={styles.linha} />
       </TouchableOpacity> */}
 
-      <Text style={styles.titulo}>Bem vindo, ASFALTOPAV! {'\n'} O que faremos hoje?</Text>
+      <Text style={styles.titulo}>Bem vindo, ASFALTOPAV!</Text> 
+      <Text style={styles.texto}>O que faremos hoje?</Text>
 
-      <TouchableOpacity style={styles.botao} onPress={() => Alert.alert('Sucesso!', 'Clicado')}>
+      <TouchableOpacity style={styles.botao} onPress={() => router.push('/abastecer')}>
           <Text style={styles.botaoTexto}>Abastecer</Text>
       </TouchableOpacity>
 
@@ -58,13 +60,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  texto: {
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
   botao: {
-    backgroundColor: '#4f46e5',
+    backgroundColor: '#e67e22',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: '50%',
+    width: '60%',
+    alignSelf: 'center'
   },
   botaoTexto: {
     color: '#fff',
