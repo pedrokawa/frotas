@@ -1,8 +1,18 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Image } from 'react-native';
+import {  View, 
+          Text,
+          TextInput, 
+          TouchableOpacity, 
+          StyleSheet, 
+          Alert, 
+          ScrollView, 
+          Image, 
+          Modal } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+
+import { api } from '@/services/api';
 
 export default function Abastecer() {
   const [placa, setPlaca] = useState('');
@@ -16,6 +26,11 @@ export default function Abastecer() {
 
   const [image, setImage] = useState<string | null>(null);
 
+  //modal
+  const [modal, setModal] = useState(false);
+  const [modalSucesso, setModalSucesso] = useState(true);
+  const [messageModal, setMessageModal] = useState('');
+  
   const router = useRouter();
 
   const totalLitro = litros && preco ? (parseFloat(litros) * parseFloat(preco)).toFixed(2) : '';
@@ -36,7 +51,40 @@ export default function Abastecer() {
     if (!result.canceled){
         setImage(result.assets[0].uri)
     }
-  } 
+  }
+  
+  const enviaAbastec = async () => {
+    if (!placa || !km || !nome || !litros || !preco || !posto ) {
+      setModalSucesso(false);
+      setMessageModal('Por favor, preencha todos os campos!')
+      setModal(true);
+      return;
+    }
+
+    try {
+      await api.registraAbastec({
+      placa,
+      marca,
+      modelo,
+      km,
+      operador: nome,
+      litros: parseFloat(litros),
+      preco: parseFloat(preco),
+      total: parseFloat(totalLitro),
+      posto,
+      foto: image || null,
+      });
+
+      setModalSucesso(true);
+      setMessageModal('Abastecimento registrado com sucesso.');
+      setModal(true);
+
+    } catch (error) {
+      setModalSucesso(false);
+      setMessageModal('Não foi possível regristar abastecimento.');
+      setModal(true);
+    } 
+  }
 
 
   return (
@@ -159,12 +207,46 @@ export default function Abastecer() {
 
       <TouchableOpacity
         style={styles.botao}
-        onPress={() => Alert.alert('Sucesso!', 'Abastecimento registrado!')}
+        onPress={enviaAbastec}
       >
         <Text style={styles.botaoTexto}>Confirmar</Text>
       </TouchableOpacity>
     </ScrollView>
+    
+    <Modal 
+      animationType='fade'
+      transparent={true}
+      visible={modal}
+      onRequestClose={() => setModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>
+              {modalSucesso ? 'Sucesso!' : 'Ops...'}  
+            </Text>  
+
+            <Text style={styles.modalText}>
+              {messageModal}
+            </Text>
+
+            <TouchableOpacity 
+            style={[styles.botaoModal, modalSucesso ? 
+                   styles.botaoSucesso : styles.botaoErro]}
+            onPress={() => {
+              setModal(false);
+              if (modalSucesso) router.back();
+            }}>
+              <Text style={styles.botaoTextoModal}>
+                OK
+              </Text>
+            </TouchableOpacity>
+          </View>      
+        </View>
+      
+    </Modal>
+    
+    
     </>
+    
   );
 }
 
@@ -198,7 +280,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   botao: {
-    backgroundColor: '#4f46e5',
+    backgroundColor: '#e67e22',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -214,7 +296,7 @@ const styles = StyleSheet.create({
   },
   botaoVoltarTexto: {
     fontSize: 16,
-    color: '#4f46e5',
+    color: '#e67e22',
     fontWeight: '600',
    },
    linha: {
@@ -223,7 +305,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
    },
    metade: {
-        flex: 1,
+    flex: 1,
    },
    inputDesabilitado: {
     backgroundColor: '#e9e9e9',
@@ -232,14 +314,14 @@ const styles = StyleSheet.create({
    botaoFoto: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#4f46e5',
+    borderColor: '#e67e22',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
     marginBottom: 10,
    },
    botaoFotoTexto: {
-    color: '#4f46e5',
+    color: '#e67e22',
     fontSize: 16,
     fontWeight: '600',
    },
@@ -249,4 +331,52 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 20,
    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo preto com 50% de transparência
+    },
+    modalBox: {
+      width: '80%',
+      backgroundColor: '#fff',
+      borderRadius: 20,
+      padding: 24,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5, // Sombra no Android
+    },
+    modalTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: '#1a1a2e',
+      marginBottom: 10,
+    },
+    modalText: {
+      fontSize: 16,
+      color: '#555',
+      textAlign: 'center',
+      marginBottom: 24,
+    },
+    botaoModal: {
+      paddingVertical: 14,
+      paddingHorizontal: 40,
+      borderRadius: 12,
+      width: '100%',
+      alignItems: 'center',
+    },
+    botaoSucesso: {
+      backgroundColor: '#e67e22', // Mantive a cor primária do seu app
+    },
+    botaoErro: {
+      backgroundColor: '#e11d48', // Vermelho para erro
+    },
+    botaoTextoModal: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
 });
