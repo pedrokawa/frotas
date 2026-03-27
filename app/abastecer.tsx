@@ -298,85 +298,85 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#e67e22',
     fontWeight: '600',
-   },
-   linha: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 8,
-   },
-   metade: {
+  },
+  linha: {
+   flexDirection: 'row',
+   gap: 12,
+   marginBottom: 8,
+  },
+  metade: {
+   flex: 1,
+  },
+  inputDesabilitado: {
+   backgroundColor: '#e9e9e9',
+   color: '#999',
+  },
+  botaoFoto: {
+   backgroundColor: '#fff',
+   borderWidth: 1,
+   borderColor: '#e67e22',
+   borderRadius: 12,
+   paddingVertical: 14,
+   alignItems: 'center',
+   marginBottom: 10,
+  },
+  botaoFotoTexto: {
+   color: '#e67e22',
+   fontSize: 16,
+   fontWeight: '600',
+  },
+  preview: {
+   width: '100%',
+   height: 200,
+   borderRadius: 12,
+   marginBottom: 20,
+  },
+  modalOverlay: {
     flex: 1,
-   },
-   inputDesabilitado: {
-    backgroundColor: '#e9e9e9',
-    color: '#999',
-   },
-   botaoFoto: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e67e22',
-    borderRadius: 12,
-    paddingVertical: 14,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo preto com 50% de transparência
+  },
+  modalBox: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5, // Sombra no Android
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1a1a2e',
     marginBottom: 10,
-   },
-   botaoFotoTexto: {
-    color: '#e67e22',
+  },
+  modalText: {
     fontSize: 16,
-    fontWeight: '600',
-   },
-   preview: {
-    width: '100%',
-    height: 200,
+    color: '#555',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  botaoModal: {
+    paddingVertical: 14,
+    paddingHorizontal: 40,
     borderRadius: 12,
-    marginBottom: 20,
-   },
-    modalOverlay: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo preto com 50% de transparência
-    },
-    modalBox: {
-      width: '80%',
-      backgroundColor: '#fff',
-      borderRadius: 20,
-      padding: 24,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5, // Sombra no Android
-    },
-    modalTitle: {
-      fontSize: 22,
-      fontWeight: 'bold',
-      color: '#1a1a2e',
-      marginBottom: 10,
-    },
-    modalText: {
-      fontSize: 16,
-      color: '#555',
-      textAlign: 'center',
-      marginBottom: 24,
-    },
-    botaoModal: {
-      paddingVertical: 14,
-      paddingHorizontal: 40,
-      borderRadius: 12,
-      width: '100%',
-      alignItems: 'center',
-    },
-    botaoSucesso: {
-      backgroundColor: '#e67e22', // Mantive a cor primária do seu app
-    },
-    botaoErro: {
-      backgroundColor: '#e11d48', // Vermelho para erro
-    },
-    botaoTextoModal: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
+    width: '100%',
+    alignItems: 'center',
+  },
+  botaoSucesso: {
+    backgroundColor: '#e67e22',
+  },
+  botaoErro: {
+    backgroundColor: '#e11d48', 
+  },
+  botaoTextoModal: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
