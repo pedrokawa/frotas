@@ -14,7 +14,8 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { api } from '@/services/api';
 
-export default function Abastecer() {
+export default function Cadastrar() {
+
   const [placa, setPlaca] = useState('');
   const [litros, setLitros] = useState('');
   const [posto, setPosto] = useState('');
@@ -33,41 +34,9 @@ export default function Abastecer() {
   
   const router = useRouter();
 
-  //busca veiculo
-  const buscaVeiculo = async(placa: string) => {
-    if (placa.length < 7) return;
-
-    try {
-      const veiculo = await api.buscaVeiculo(placa);
-      setMarca(veiculo.marca);
-      setModelo(veiculo.modelo);
-    } catch (error) {
-      setMarca('');
-      setModelo('');
-    }
-  }
-  
   const totalLitro = litros && preco ? (parseFloat(litros) * parseFloat(preco)).toFixed(2) : '';
 
-  const tirarFoto = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-
-    if(!permission.granted){
-        Alert.alert('Permissão negada.', 'Habilite o acesso a câmera.');
-        return
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        quality: 0.7,
-    });
-
-    if (!result.canceled){
-        setImage(result.assets[0].uri)
-    }
-  }
-  
-  const enviaAbastec = async () => {
+  const cadastraVeic = async () => {
     if (!placa || !km || !nome || !litros || !preco || !posto ) {
       setModalSucesso(false);
       setMessageModal('Por favor, preencha todos os campos!')
@@ -111,7 +80,7 @@ export default function Abastecer() {
         <Text style={styles.label}>Voltar</Text>
       </TouchableOpacity>
       
-      <Text style={styles.titulo}>Abastecimento</Text>
+      <Text style={styles.titulo}>Cadastro de veículos</Text>
 
       <Text style={styles.label}>Placa do veículo</Text>
       <TextInput
@@ -119,113 +88,39 @@ export default function Abastecer() {
         placeholder='Ex: ABC-1234'
         value={placa}
         onChangeText={setPlaca}
-        onBlur={() => buscaVeiculo(placa)}
-        autoCapitalize='characters'
       />
 
-        <View style={styles.linha}>
-            <View style={styles.metade}>
-                <Text style={styles.label}>Marca</Text>
-                <TextInput
-                style={[styles.input, styles.inputDesabilitado]}
-                placeholder='Auto preenchido'
-                value={marca}
-                editable={false}
-                onChangeText={setMarca}
-                />
-            </View>
-
-            <View style={styles.metade}>
-                <Text style={styles.label}>Modelo</Text>
-                <TextInput
-                style={[styles.input, styles.inputDesabilitado]}
-                placeholder='Auto preenchido'
-                value={modelo}
-                editable={false}
-                onChangeText={setModelo}
-                />
-            </View>
-        </View>
-
-    <Text style={styles.label}>KM do veículo</Text>
+    <Text style={styles.label}>Marca</Text>
         <TextInput
-        style={styles.input}
-        placeholder='KM'
-        value={km}
-        keyboardType='numeric'
-        // editable={false}
-        onChangeText={setKm}
+            style={styles.input}
+            placeholder='Marca'
+            value={marca}
+            // editable={false}
+            onChangeText={setMarca}
+        />
+        <Text style={styles.label}>Modelo</Text>
+        <TextInput
+            style={styles.input}
+            placeholder='Modelo'
+            value={modelo}
+            editable={false}
+            onChangeText={setModelo}
         />
 
-      <Text style={styles.label}>Operador</Text>
-      <TextInput
-        style={styles.input}
-        placeholder='Nome do operador'
-        value={nome}
-        onChangeText={setNome}
-      />
 
-    <View style={styles.linha}>
-      <View style={styles.metade}>
-      <Text style={styles.label}>Litros</Text>
-      <TextInput
-        style={styles.input}
-        placeholder='Ex: 50'
-        keyboardType='numeric'
-        value={litros}
-        onChangeText={setLitros}
-      />
-      </View>  
-      
-      <View style={styles.metade}>
-      <Text style={styles.label}>Preço</Text>
-      <TextInput
-        style={styles.input}
-        placeholder='Preço/litro'
-        keyboardType='numeric'
-        value={preco}
-        onChangeText={setPreco}
-      />
-      </View>
-    </View>
-
-      <Text style={styles.label}>Total</Text>
-      <TextInput
-        style={[styles.input, styles.inputDesabilitado]}
-        placeholder='Total'
-        value={totalLitro ? `R$ ${totalLitro}` : ''}
-        editable={false}
-        // value={total}
-        // onChangeText={setTotal}
-      />    
-
-      <Text style={styles.label}>Posto</Text>
+      {/* <Text style={styles.label}>Posto</Text>
       <TextInput
         style={styles.input}
         placeholder='Ex: Posto Shell Centro'
         value={posto}
         onChangeText={setPosto}
-      />
-
-      <Text style={styles.label}>Foto do painel</Text>
-      <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
-        <Text style={styles.botaoFotoTexto}>
-            {image ? 'Trocar foto' : 'Tirar foto'}
-        </Text>
-      </TouchableOpacity>
-
-      {image && (
-        <Image
-        source={{uri: image}}
-        style={styles.preview}>
-        </Image>
-      )}
+      /> */}
 
       <TouchableOpacity
         style={styles.botao}
-        onPress={enviaAbastec}
+        // onPress={enviaAbastec}
       >
-        <Text style={styles.botaoTexto}>Confirmar</Text>
+        <Text style={styles.botaoTexto}>Cadastrar</Text>
       </TouchableOpacity>
     </ScrollView>
     

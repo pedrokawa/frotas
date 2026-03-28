@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TextInput, StyleSheet, Text, TouchableOpacity, View, Modal, ScrollView } from 'react-native';
+import { TextInput, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
         <Text style={styles.titulo}>Bem vindo, Gerência!</Text> 
         <Text style={styles.texto}>O que faremos hoje?</Text>
 
-        <TouchableOpacity style={styles.botao} onPress={() => router.push('/')}>
+        <TouchableOpacity style={styles.botao} onPress={() => router.push('/cadastro')}>
             <Text style={styles.botaoTexto}>Cadastrar</Text>
         </TouchableOpacity>
 

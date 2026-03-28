@@ -1,4 +1,4 @@
-const BASE_URL = 'http://172.17.1.189:3000';
+const BASE_URL = 'http://192.168.0.5:3000';
 
 export const api = {
     registraAbastec: async (dados: {
@@ -27,5 +27,13 @@ export const api = {
         const response = await fetch(`${BASE_URL}/api/abastecimento`);
         if (!response.ok) throw new Error('Erro ao buscar abastecimentos.');
         return response.json();
+    },
+
+    buscaVeiculo: async (placa: string) => {
+        const response = await fetch(`${BASE_URL}/api/veiculos/${placa}`);
+        if (!response.ok) throw new Error('Veículo não encontrado.');
+        return response.json();
     }
+
+
 }

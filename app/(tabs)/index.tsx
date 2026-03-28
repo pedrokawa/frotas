@@ -67,6 +67,16 @@ export default function Home() {
             <Text style={styles.modalTitle}>Acesso Restrito</Text>
             <Text style={styles.modalText}>Digite o PIN:</Text>
 
+            {/* <TextInput
+              style={styles.inputUser}
+              // keyboardType="numeric"
+              secureTextEntry={true} // <-- Esconde os números com "bolinhas"
+              maxLength={4} // Limita a 4 números
+              value={senhaPin}
+              onChangeText={setSenhaPin}
+              autoFocus={true} // Já abre o teclado sozinho
+            /> */}
+
             <TextInput
               style={styles.inputPin}
               keyboardType="numeric"
@@ -163,6 +173,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   }, 
+  // inputUser: {
+  //   borderWidth: 2,
+  //   borderColor: '#e67e22',
+  //   borderRadius: 10,
+  //   fontSize: 24,
+  //   textAlign: 'center',
+  //   padding: 10,
+  //   width: '100%',
+  //   marginBottom: 10,
+  //   letterSpacing: 10, // Afasta as bolinhas da senha
+  // },
   inputPin: {
     borderWidth: 2,
     borderColor: '#e67e22',
@@ -170,7 +191,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     padding: 10,
-    width: '60%',
+    width: '100%',
     marginBottom: 10,
     letterSpacing: 10, // Afasta as bolinhas da senha
   },
