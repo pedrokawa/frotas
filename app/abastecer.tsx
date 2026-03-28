@@ -7,7 +7,7 @@ import {  View,
           ScrollView, 
           Image, 
           Modal } from 'react-native';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -23,6 +23,7 @@ export default function Abastecer() {
   const [modelo, setModelo] = useState('');
   const [nome, setNome] = useState('');
   const [km, setKm] = useState('');
+  const [placaValida, setPlacaValida] = useState(false);
 
   const [image, setImage] = useState<string | null>(null);
 
@@ -30,20 +31,29 @@ export default function Abastecer() {
   const [modal, setModal] = useState(false);
   const [modalSucesso, setModalSucesso] = useState(true);
   const [messageModal, setMessageModal] = useState('');
-  
+  const [placaModal, setPlacaModal] = useState(false)
   const router = useRouter();
+
+  const placaRef = useRef<TextInput>(null);
 
   //busca veiculo
   const buscaVeiculo = async(placa: string) => {
-    if (placa.length < 7) return;
+    if (! placa || placa.length < 7) {
+      setPlacaValida(false);
+      setPlacaModal(true);
+      return;
+    }
 
     try {
       const veiculo = await api.buscaVeiculo(placa);
       setMarca(veiculo.marca);
       setModelo(veiculo.modelo);
+      setPlacaValida(true);
     } catch (error) {
       setMarca('');
       setModelo('');
+      setPlacaValida(false);
+      setPlacaModal(true);
     }
   }
   
@@ -72,6 +82,11 @@ export default function Abastecer() {
       setModalSucesso(false);
       setMessageModal('Por favor, preencha todos os campos!')
       setModal(true);
+      return;
+    }
+
+    if (!placaValida) {
+      setPlacaModal(true);
       return;
     }
 
@@ -115,11 +130,17 @@ export default function Abastecer() {
 
       <Text style={styles.label}>Placa do veículo</Text>
       <TextInput
+        ref={placaRef}
         style={styles.input}
         placeholder='Ex: ABC-1234'
         value={placa}
-        onChangeText={setPlaca}
-        onBlur={() => buscaVeiculo(placa)}
+        onChangeText={(text) => {
+          setPlaca(text);
+          setPlacaValida(false);
+          setMarca('');
+          setModelo('');
+        }}
+        onEndEditing={(e) => buscaVeiculo(e.nativeEvent.text)}
         autoCapitalize='characters'
       />
 
@@ -149,7 +170,8 @@ export default function Abastecer() {
 
     <Text style={styles.label}>KM do veículo</Text>
         <TextInput
-        style={styles.input}
+        style={[styles.input, !placaValida && styles.inputDesabilitado]}
+        editable={placaValida}
         placeholder='KM'
         value={km}
         keyboardType='numeric'
@@ -159,7 +181,8 @@ export default function Abastecer() {
 
       <Text style={styles.label}>Operador</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, !placaValida && styles.inputDesabilitado]}
+        editable={placaValida}
         placeholder='Nome do operador'
         value={nome}
         onChangeText={setNome}
@@ -169,7 +192,8 @@ export default function Abastecer() {
       <View style={styles.metade}>
       <Text style={styles.label}>Litros</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, !placaValida && styles.inputDesabilitado]}
+        editable={placaValida}
         placeholder='Ex: 50'
         keyboardType='numeric'
         value={litros}
@@ -180,7 +204,8 @@ export default function Abastecer() {
       <View style={styles.metade}>
       <Text style={styles.label}>Preço</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, !placaValida && styles.inputDesabilitado]}
+        editable={placaValida}
         placeholder='Preço/litro'
         keyboardType='numeric'
         value={preco}
@@ -201,7 +226,8 @@ export default function Abastecer() {
 
       <Text style={styles.label}>Posto</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, !placaValida && styles.inputDesabilitado]}
+        editable={placaValida}
         placeholder='Ex: Posto Shell Centro'
         value={posto}
         onChangeText={setPosto}
@@ -228,6 +254,34 @@ export default function Abastecer() {
         <Text style={styles.botaoTexto}>Confirmar</Text>
       </TouchableOpacity>
     </ScrollView>
+
+    <Modal 
+    animationType='fade'
+    transparent={true}
+    visible={placaModal}
+    onRequestClose={() => setPlacaModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalBox}>
+          <Text style={styles.modalTitle}>
+            Placa não encontrada.
+          </Text>
+          <Text style={styles.modalText}>
+            Verifique a placa e tente novamente.
+          </Text>
+
+          <TouchableOpacity 
+          style={[styles.botaoModal, styles.botaoErro]}
+          onPress={() => {
+            setPlacaModal(false);
+            setPlaca('');
+            setTimeout(() => placaRef.current?.focus(), 100);
+          }}>
+            <Text style={styles.botaoTextoModal}>Tentar novamente.</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
     
     <Modal 
       animationType='fade'
