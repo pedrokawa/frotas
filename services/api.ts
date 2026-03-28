@@ -1,4 +1,4 @@
-const BASE_URL = 'http://192.168.0.5:3000';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const api = {
     registraAbastec: async (dados: {
