@@ -17,16 +17,19 @@ import { api } from '@/services/api';
 export default function Cadastrar() {
 
   const [placa, setPlaca] = useState('');
-  const [litros, setLitros] = useState('');
-  const [posto, setPosto] = useState('');
-  const [preco, setPreco] = useState('');
+  const [codigoFrota, setCodigoFrota] = useState('');
   const [marca, setMarca] = useState('');
   const [modelo, setModelo] = useState('');
-  const [nome, setNome] = useState('');
-  const [km, setKm] = useState('');
-
-  const [image, setImage] = useState<string | null>(null);
-
+  const [anoFabricacao, setAnoFabricacao] = useState('');
+  const [anoModelo, setAnoModelo] = useState('');
+  const [chassi, setChassi] = useState('');
+  const [renavam, setRenavam] = useState('');
+  const [cor, setCor] = useState('');
+  const [combustivel, setCombustivel] = useState('');
+  const [kmAtual, setKmAtual] = useState('');
+  const [status, setStatus] = useState('');
+  const [observacoes, setObservacoes] = useState('');
+  
   //modal
   const [modal, setModal] = useState(false);
   const [modalSucesso, setModalSucesso] = useState(true);
@@ -34,10 +37,19 @@ export default function Cadastrar() {
   
   const router = useRouter();
 
-  const totalLitro = litros && preco ? (parseFloat(litros) * parseFloat(preco)).toFixed(2) : '';
-
   const cadastraVeic = async () => {
-    if (!placa || !km || !nome || !litros || !preco || !posto ) {
+    if (!placa || 
+        !codigoFrota || 
+        !marca || 
+        !modelo || 
+        !anoFabricacao || 
+        !anoModelo ||
+        !renavam ||
+        !cor ||
+        !combustivel ||
+        !kmAtual ||
+        !status
+      ) {
       setModalSucesso(false);
       setMessageModal('Por favor, preencha todos os campos!')
       setModal(true);
@@ -45,26 +57,29 @@ export default function Cadastrar() {
     }
 
     try {
-      await api.registraAbastec({
-      placa,
-      marca,
-      modelo,
-      km,
-      operador: nome,
-      litros: parseFloat(litros),
-      preco: parseFloat(preco),
-      total: parseFloat(totalLitro),
-      posto,
-      foto: image || null,
+      await api.cadastraVeic({
+        placa,
+        codigoFrota,
+        marca,
+        modelo,
+        anoFabricacao: parseInt(anoFabricacao),
+        anoModelo: parseInt(anoModelo),
+        chassi,
+        renavam,
+        cor,
+        combustivel,
+        kmAtual: parseInt(kmAtual),
+        status,
+        observacoes
       });
 
       setModalSucesso(true);
-      setMessageModal('Abastecimento registrado com sucesso.');
+      setMessageModal('Veículo cadastrado com sucesso.');
       setModal(true);
 
     } catch (error) {
       setModalSucesso(false);
-      setMessageModal('Não foi possível regristar abastecimento.');
+      setMessageModal('Não foi possível cadastrar veículo.');
       setModal(true);
     } 
   }
@@ -88,39 +103,98 @@ export default function Cadastrar() {
         placeholder='Ex: ABC-1234'
         value={placa}
         onChangeText={setPlaca}
+        autoCapitalize='characters'
       />
 
-    <Text style={styles.label}>Marca</Text>
-        <TextInput
-            style={styles.input}
-            placeholder='Marca'
-            value={marca}
-            // editable={false}
-            onChangeText={setMarca}
-        />
-        <Text style={styles.label}>Modelo</Text>
-        <TextInput
-            style={styles.input}
-            placeholder='Modelo'
-            value={modelo}
-            editable={false}
-            onChangeText={setModelo}
-        />
+      <Text style={styles.label}>Marca</Text>
+      <TextInput
+          style={styles.input}
+          placeholder='Marca'
+          value={marca}
+          // editable={false}
+          onChangeText={setMarca}
+      />
+      
+      <Text style={styles.label}>Modelo</Text>
+      <TextInput
+          style={styles.input}
+          placeholder='Modelo'
+          value={modelo}
+          onChangeText={setModelo}
+      />
 
 
-      {/* <Text style={styles.label}>Posto</Text>
+      <Text style={styles.label}> Cod. Frota</Text>
       <TextInput
         style={styles.input}
-        placeholder='Ex: Posto Shell Centro'
-        value={posto}
-        onChangeText={setPosto}
-      /> */}
+        placeholder='Ex: FIAT/SIENA FIRE FLEX'
+        value={codigoFrota}
+        onChangeText={setCodigoFrota}
+      />
+
+      <Text style={styles.label}> Ano Fabricação</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Ano Fabricação'
+        keyboardType='numeric'
+        value={anoFabricacao}
+        onChangeText={setAnoFabricacao}
+      />
+
+      <Text style={styles.label}> Ano Modelo</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Ano Modelo'
+        keyboardType='numeric'
+        value={anoModelo}
+        onChangeText={setAnoModelo}
+      />
+
+      <Text style={styles.label}> Renavam</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Renavam'
+        value={renavam}
+        onChangeText={setRenavam}
+      />
+
+      <Text style={styles.label}> Cor</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Cor'
+        value={cor}
+        onChangeText={setCor}
+      />
+
+      <Text style={styles.label}> Combustível</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Ex: GASOLINA/ALCOOL/DIESEL/FLEX'
+        value={combustivel}
+        onChangeText={setCombustivel}
+      />
+
+      <Text style={styles.label}> KM Atual</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='KM Atual'
+        value={kmAtual}
+        onChangeText={setKmAtual}
+      />
+
+      <Text style={styles.label}> Status</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Ex: ATIVO/INATIVO'
+        value={status}
+        onChangeText={setStatus}
+      />
 
       <TouchableOpacity
         style={styles.botao}
-        // onPress={enviaAbastec}
+        onPress={cadastraVeic}
       >
-        <Text style={styles.botaoTexto}>Cadastrar</Text>
+        <Text style={styles.botaoTexto}>Cadastrar veículo</Text>
       </TouchableOpacity>
     </ScrollView>
     

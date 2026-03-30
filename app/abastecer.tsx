@@ -25,6 +25,8 @@ export default function Abastecer() {
   const [km, setKm] = useState('');
   const [placaValida, setPlacaValida] = useState(false);
 
+  // const [tipoMedi, setTipoMedi] = useState<'km' | 'horimetro'>('km');
+
   const [image, setImage] = useState<string | null>(null);
 
   //modal

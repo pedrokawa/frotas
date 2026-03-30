@@ -33,7 +33,32 @@ export const api = {
         const response = await fetch(`${BASE_URL}/api/veiculos/${placa}`);
         if (!response.ok) throw new Error('Veículo não encontrado.');
         return response.json();
-    }
+    },
+
+    cadastraVeic: async (dados: {
+        placa: string;
+        codigoFrota: string;
+        marca?: string;
+        modelo?: string;
+        anoFabricacao: number;
+        anoModelo: number;
+        chassi: string;
+        renavam: string;
+        cor: string;
+        combustivel: string;
+        kmAtual: number;
+        status: string;
+        observacoes: string
+    }) => {
+        const resp = await fetch(`${BASE_URL}/api/veiculos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados),
+        });
+
+        if (!resp.ok) throw new Error('Erro ao cadastrar.');
+        return resp.json();
+    }, 
 
 
 }
