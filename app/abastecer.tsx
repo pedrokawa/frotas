@@ -172,7 +172,7 @@ export default function Abastecer() {
         <TextInput
         style={[styles.input, !placaValida && styles.inputDesabilitado]}
         editable={placaValida}
-        placeholder='KM'
+        placeholder='Se horímetro, coloque 00 aqui.'
         value={km}
         keyboardType='numeric'
         // editable={false}
