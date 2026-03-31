@@ -10,7 +10,6 @@ import {  View,
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
 
 import { api } from '@/services/api';
 

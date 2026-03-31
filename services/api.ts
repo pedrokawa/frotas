@@ -61,5 +61,18 @@ export const api = {
         return resp.json();
     }, 
 
+    login: async (user: string, password: string) => {
+        const response = await fetch(`${BASE_URL}/api/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user, password}),
+        });
+
+        if (!response.ok) throw new Error('Usuário ou senha incorretos.');
+        return response.json();
+    }
+
 
 }

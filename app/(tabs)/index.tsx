@@ -1,39 +1,42 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Alert, TextInput, StyleSheet, Text, TouchableOpacity, View, Modal } from 'react-native';
-import Sidebar from '@/components/sidebar';
 import { useRouter } from 'expo-router';
+import { api } from '@/services/api';
 
 export default function Home() {
   const [modalPin, setModalPin] = useState(false);
   const [senhaPin, setSenhaPin] = useState('');
   const [erroPin, setErroPin] = useState('');
+  const [userPin, setUserPin] = useState('');
 
-  const SENHA_GERENCIA = '1406';
   const router = useRouter();
 
-  const validatePass = () => {
-    if(senhaPin === SENHA_GERENCIA) {
+  const userRef = useRef<TextInput>(null);
+
+  const validatePass = async () => {
+    if(!userPin || !senhaPin) {
+      setErroPin('Preencha usuário e senha.');
+      return;
+    }
+
+    try {
+      await api.login(userPin, senhaPin);
       setErroPin('');
       setSenhaPin('');
+      setUserPin('');
       setModalPin(false);
       router.push('/gerencia');
-    }else{
-      setErroPin('PIN incorreto. Tente novamente.');
+    }catch (error) {
+      setErroPin('Usuário ou senha incorretos.');
       setSenhaPin('');
+      setUserPin('');
+      setTimeout(() => userRef.current?.focus(), 100);
     }
   }
 
   return (
     <>
     <View style={styles.container}>
-      {/* <TouchableOpacity
-        style={styles.menuBotao}
-        onPress={() => setSidebarAberta(true)}
-      >
-        <View style={styles.linha} />
-        <View style={styles.linha} />
-        <View style={styles.linha} />
-      </TouchableOpacity> */}
 
       <Text style={styles.titulo}>Bem vindo, ASFALTOPAV!</Text> 
       <Text style={styles.texto}>O que faremos hoje?</Text>
@@ -43,14 +46,8 @@ export default function Home() {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.botaoGerencia} onPress={() => setModalPin(true)}>
-          <Text style={styles.botaoTexto}>Gerencia</Text>
+          <Text style={styles.botaoTexto}>Gerência</Text>
       </TouchableOpacity>
-
-      {/* Sidebar */}
-      {/* <Sidebar
-        visivel={sidebarAberta}
-        aoFechar={() => setSidebarAberta(false)}
-      /> */}
     </View>
 
     <Modal
@@ -65,20 +62,22 @@ export default function Home() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Acesso Restrito</Text>
-            <Text style={styles.modalText}>Digite o PIN:</Text>
+            <Text style={styles.modalText}>Digite as credenciais:</Text>
 
-            {/* <TextInput
+            <TextInput
+              ref={userRef}
               style={styles.inputUser}
-              // keyboardType="numeric"
-              secureTextEntry={true} // <-- Esconde os números com "bolinhas"
-              maxLength={4} // Limita a 4 números
-              value={senhaPin}
-              onChangeText={setSenhaPin}
-              autoFocus={true} // Já abre o teclado sozinho
-            /> */}
+              placeholder='Usuário'
+              value={userPin}
+              autoCapitalize='none'
+              autoCorrect={false}
+              onChangeText={setUserPin}
+              autoFocus={true}
+            />
 
             <TextInput
               style={styles.inputPin}
+              placeholder='Senha'
               keyboardType="numeric"
               secureTextEntry={true} // <-- Esconde os números com "bolinhas"
               maxLength={4} // Limita a 4 números
@@ -173,27 +172,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   }, 
-  // inputUser: {
-  //   borderWidth: 2,
-  //   borderColor: '#e67e22',
-  //   borderRadius: 10,
-  //   fontSize: 24,
-  //   textAlign: 'center',
-  //   padding: 10,
-  //   width: '100%',
-  //   marginBottom: 10,
-  //   letterSpacing: 10, // Afasta as bolinhas da senha
-  // },
+  inputUser: {
+    borderWidth: 2,
+    borderColor: '#e67e22',
+    borderRadius: 10,
+    fontSize: 24,
+    // textAlign: 'center',
+    width: '100%',
+    marginBottom: 10,
+  },
   inputPin: {
     borderWidth: 2,
     borderColor: '#e67e22',
     borderRadius: 10,
     fontSize: 24,
-    textAlign: 'center',
+    // textAlign: 'center',
     padding: 10,
     width: '100%',
     marginBottom: 10,
-    letterSpacing: 10, // Afasta as bolinhas da senha
+    letterSpacing: 6, // Afasta as bolinhas da senha
   },
   textoErro: {
     color: '#e11d48',
