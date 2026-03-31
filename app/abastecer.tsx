@@ -23,9 +23,10 @@ export default function Abastecer() {
   const [modelo, setModelo] = useState('');
   const [nome, setNome] = useState('');
   const [km, setKm] = useState('');
+  const [horimetro, setHorimetro] = useState('');
   const [placaValida, setPlacaValida] = useState(false);
 
-  // const [tipoMedi, setTipoMedi] = useState<'km' | 'horimetro'>('km');
+  const [tipoMedi, setTipoMedi] = useState<'km' | 'horimetro'>('km');
 
   const [image, setImage] = useState<string | null>(null);
 
@@ -80,7 +81,8 @@ export default function Abastecer() {
   }
   
   const enviaAbastec = async () => {
-    if (!placa || !km || !nome || !litros || !preco || !posto ) {
+
+    if (!placa || !nome || !litros || !preco || !posto ) {
       setModalSucesso(false);
       setMessageModal('Por favor, preencha todos os campos!')
       setModal(true);
@@ -97,7 +99,8 @@ export default function Abastecer() {
       placa,
       marca,
       modelo,
-      km,
+      km: km || '0',
+      horimetro: horimetro || '0',
       operador: nome,
       litros: parseFloat(litros),
       preco: parseFloat(preco),
@@ -170,16 +173,42 @@ export default function Abastecer() {
             </View>
         </View>
 
-    <Text style={styles.label}>KM do veículo</Text>
-        <TextInput
+        <Text style={styles.label}>Medição</Text>
+        <View style={styles.tabs}>
+          <TouchableOpacity 
+          style={[styles.tab, tipoMedi === 'km' && styles.tabAtivo]}
+          onPress={() => {
+            setTipoMedi('km');
+            setHorimetro('');
+            }}>
+            <Text style={[styles.tabTexto, tipoMedi === 'km' && styles.tabTextoAtivo]}>
+              KM
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+          style={[styles.tab, tipoMedi === 'horimetro' && styles.tabAtivo]}
+          onPress={() => {
+            setTipoMedi('horimetro');
+            setKm('');
+            }}>
+            <Text style={[styles.tabTexto, tipoMedi === 'horimetro' && styles.tabTextoAtivo]}>
+              Horímetro
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.label}>
+          {tipoMedi === 'km' ? 'KM do veículo' : 'Horímetro (horas)'}
+        </Text>
+
+        <TextInput 
         style={[styles.input, !placaValida && styles.inputDesabilitado]}
-        editable={placaValida}
-        placeholder='Se horímetro, coloque 00 aqui.'
-        value={km}
+        placeholder={tipoMedi === 'km' ? 'Ex: 55000' : 'Ex: 1250'}
+        value={tipoMedi === 'km' ? km : horimetro}
         keyboardType='numeric'
-        // editable={false}
-        onChangeText={setKm}
-        />
+        editable={placaValida}
+        onChangeText={tipoMedi === 'km' ? setKm : setHorimetro} />
 
       <Text style={styles.label}>Operador</Text>
       <TextInput
@@ -451,4 +480,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  tabs: {
+    flexDirection: 'row',
+    backgroundColor: '#e9e9e9',
+    borderRadius: 10,
+    padding: 4,
+    marginBottom: 16,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  tabAtivo: {
+    backgroundColor: '#e67e22',
+  },
+  tabTexto: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#888',
+    textAlign: 'center',
+  },
+  tabTextoAtivo: {
+    color: '#fff',
+  },  
 });

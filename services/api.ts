@@ -5,7 +5,8 @@ export const api = {
         placa: string;
         marca?: string;
         modelo?: string;
-        km: string;
+        km?: string;
+        horimetro?: string;
         operador: string;
         litros: number;
         preco: number;
