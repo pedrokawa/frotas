@@ -18,7 +18,7 @@ export default function Home() {
             <Text style={styles.botaoTexto}>Cadastrar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.botaoGerencia} onPress={() => router.push('/')}>
+        <TouchableOpacity style={styles.botaoGerencia} onPress={() => router.push('/relatorio')}>
             <Text style={styles.botaoTexto}>Relatório</Text>
         </TouchableOpacity>
 

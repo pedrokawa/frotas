@@ -72,6 +72,13 @@ export const api = {
 
         if (!response.ok) throw new Error('Usuário ou senha incorretos.');
         return response.json();
+    },
+
+    buscaUltimoAbastec: async () => {
+        const response = await fetch(`${BASE_URL}/api/relatorio/abastecimento`);
+
+        if (!response.ok) throw new Error('Erro ao buscar relatório.');
+        return response.json();
     }
 
 
