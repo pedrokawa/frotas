@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router';
-import { useLocalSearchParams } from 'expo-router';
 import { api } from '@/services/api';
 import AccordionVeiculo from '@/components/accordionVeic';
 
@@ -25,7 +24,8 @@ export default function Gerencia() {
             'Litros': item.litros,
             'Valor': item.preco,
             'Total': item.total,
-            'KM': item.km
+            'KM': item.km,
+            'Horimetro': item.horimetro
         }));
 
         const ws = XLSX.utils.json_to_sheet(linhas);
