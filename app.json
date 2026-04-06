@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "frotas",
-    "slug": "frotas",
+    "name": "Abastecimento-ASFALTOPAV",
+    "slug": "frotas-abastecimento",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/abast.png",
     "scheme": "frotas",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "frotas.abastecimento"
     },
     "web": {
       "output": "static",
@@ -43,6 +44,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8e13314f-bb79-4984-8d78-3e40ec8caecc"
+      }
     }
   }
 }
