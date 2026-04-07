@@ -60,7 +60,14 @@ export default function Abastecer() {
     }
   }
   
-  const totalLitro = litros && preco ? (parseFloat(litros) * parseFloat(preco)).toFixed(2) : '';
+  const litrosFormatados = litros.replace(',', '.');
+  const precoFormatado = preco.replace(',', '.');
+
+  const litrosNum = parseFloat(litrosFormatados) || 0;
+  const precoNum = parseFloat(precoFormatado) || 0;
+  
+  const totalCalculado = litrosNum * precoNum;
+  const totalLitro = litrosNum && precoNum ? totalCalculado.toFixed(4) : '';
 
   const tirarFoto = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -102,8 +109,9 @@ export default function Abastecer() {
       km: km || '0',
       horimetro: horimetro || '0',
       operador: nome,
-      litros: parseFloat(litros),
-      preco: parseFloat(preco),
+
+      litros: litrosNum,
+      preco: precoNum,
       total: parseFloat(totalLitro),
       posto,
       foto: image || null,
