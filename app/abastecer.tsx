@@ -7,9 +7,8 @@ import {  View,
           ScrollView, 
           Image, 
           Modal } from 'react-native';
-import { useRef, useState } from 'react';
-import { useRouter } from 'expo-router';
-import { Stack } from 'expo-router';
+import { useRef, useState, useCallback } from 'react';
+import { useRouter, Stack, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 
 import { api } from '@/services/api';
@@ -38,6 +37,25 @@ export default function Abastecer() {
   const router = useRouter();
 
   const placaRef = useRef<TextInput>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      setPlaca('');
+      setLitros('');
+      setPreco('');
+      setMarca('');
+      setModelo('');
+      setNome('');
+      setKm('');
+      setHorimetro('');
+      setPosto('');
+      setPlacaValida(false);
+      setImage(null);
+      setTipoMedi('km');
+
+      return () => {};
+    }, [])
+  );
 
   //busca veiculo
   const buscaVeiculo = async(placa: string) => {
