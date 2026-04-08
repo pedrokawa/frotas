@@ -31,6 +31,24 @@ export default function AccordionVeiculo({ placa, marca, modelo, ultimoAbastecim
     });
   };
 
+  const truncate = (valor: number) => {
+    return Math.trunc(valor * 100) / 100; 
+  }
+
+  const formataMoeda = (valor: number) => {
+    const moedaTruncada = truncate(valor);
+    return moedaTruncada.toLocaleString('pt-BR', 
+      { style: 'currency', currency: 'BRL' });
+  };
+
+  const formataNumero = (valor: number) => {
+    const valorTruncado = truncate(valor);
+    return valorTruncado.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.header} onPress={() => setAberto(!aberto)}>
@@ -51,15 +69,15 @@ export default function AccordionVeiculo({ placa, marca, modelo, ultimoAbastecim
               </View>
               <View style={styles.linha}>
                 <Text style={styles.chave}>Litros</Text>
-                <Text style={styles.valor}>{ultimoAbastecimento.litros} L</Text>
+                <Text style={styles.valor}>{formataNumero(ultimoAbastecimento.litros)} L</Text>
               </View>
               <View style={styles.linha}>
                 <Text style={styles.chave}>Preço/litro</Text>
-                <Text style={styles.valor}>R$ {ultimoAbastecimento.preco.toFixed(2)}</Text>
+                <Text style={styles.valor}>{formataMoeda(ultimoAbastecimento.preco)}</Text>
               </View>
               <View style={styles.linha}>
                 <Text style={styles.chave}>Total</Text>
-                <Text style={styles.valor}>R$ {ultimoAbastecimento.total.toFixed(2)}</Text>
+                <Text style={styles.valor}>{formataMoeda(ultimoAbastecimento.total)}</Text>
               </View>
               <View style={styles.linha}>
                 <Text style={styles.chave}>KM</Text>
