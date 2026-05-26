@@ -1,6 +1,7 @@
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const api = {
+  //abastecimentos
   registraAbastec: async (dados: {
     placa: string;
     marca?: string;
@@ -35,7 +36,15 @@ export const api = {
     if (!response.ok) throw new Error("Erro ao buscar abastecimentos.");
     return response.json();
   },
+  
+  buscaUltimoAbastec: async () => {
+    const response = await fetch(`${BASE_URL}/api/relatorio/abastecimento`);
 
+    if (!response.ok) throw new Error("Erro ao buscar relatório.");
+    return response.json();
+  },
+
+  //veiculos
   buscaVeiculo: async (placa: string) => {
     const response = await fetch(`${BASE_URL}/api/veiculos/${placa}`);
     if (!response.ok) throw new Error("Veículo não encontrado.");
@@ -67,6 +76,36 @@ export const api = {
     return resp.json();
   },
 
+  //medicao
+  registraMedicao: async (dados: {
+            dataMedicao: string,
+            apontador: string, 
+            rodovia: string,
+            sentido: string,
+            kmIni: number,
+            kmFim: number,
+            extensao: number,
+            largura: number,
+            faixa: string,
+            areaTotal: number,
+            observacoes: string,
+            foto: string,
+  }) => {
+    const response = await fetch(`${BASE_URL}/api/medicao`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify(dados),
+    });
+    
+    if (!response.ok) throw new Error("Erro ao registrar medição.");
+    return response.json();
+  },
+
+
+  //login
   login: async (user: string, password: string) => {
     const response = await fetch(`${BASE_URL}/api/login`, {
       method: "POST",
@@ -77,13 +116,6 @@ export const api = {
     });
 
     if (!response.ok) throw new Error("Usuário ou senha incorretos.");
-    return response.json();
-  },
-
-  buscaUltimoAbastec: async () => {
-    const response = await fetch(`${BASE_URL}/api/relatorio/abastecimento`);
-
-    if (!response.ok) throw new Error("Erro ao buscar relatório.");
     return response.json();
   },
 };
