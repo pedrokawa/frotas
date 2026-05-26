@@ -41,7 +41,11 @@ export default function Home() {
       <Text style={styles.titulo}>Bem vindo, ASFALTOPAV!</Text> 
       <Text style={styles.texto}>O que faremos hoje?</Text>
 
-      <TouchableOpacity style={styles.botao} onPress={() => router.push('/abastecer')}>
+      <TouchableOpacity style={styles.botaoMedi} onPress={() => router.push('/medicao')}>
+          <Text style={styles.botaoTexto}>Medição</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.botaoAbast} onPress={() => router.push('/abastecer')}>
           <Text style={styles.botaoTexto}>Abastecer</Text>
       </TouchableOpacity>
 
@@ -147,13 +151,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  botao: {
+  botaoMedi: {
     backgroundColor: '#e67e22',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: '50%',
+    width: '60%',
+    alignSelf: 'center'
+  },
+  botaoAbast:{
+    backgroundColor: '#e67e22',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: '10%',
     width: '60%',
     alignSelf: 'center'
   },
