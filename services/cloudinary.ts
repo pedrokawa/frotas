@@ -1,4 +1,8 @@
 export const uploadCloudinary = async (uri: string, presetName: string) => {
+  if (!uri) {
+    throw new Error("A URI da foto está vazia.");
+  }
+
   const data = new FormData();
 
   data.append("file", {
@@ -25,9 +29,16 @@ export const uploadCloudinary = async (uri: string, presetName: string) => {
 
     const json = await response.json();
 
+    if (json.error) {
+      //   console.log("❌ REJEIÇÃO DO CLOUDINARY:", json.error.message);
+      throw new Error(json.error.message);
+    }
+
     if (json.secure_url) {
-      return json.secure.url;
+      //   console.log("✅ UPLOAD COM SUCESSO! Link:", json.secure_url);
+      return json.secure_url;
     } else {
+      //   console.log("Erro estranho:", json);
       throw new Error("Erro ao gerar link no Cloudinary.");
     }
   } catch (error) {
