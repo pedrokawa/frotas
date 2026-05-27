@@ -9,11 +9,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 import { api } from "@/services/api";
 
+import { uploadCloudinary } from "@/services/cloudinary";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Abastecer() {
@@ -115,6 +116,28 @@ export default function Abastecer() {
     setHorario(v);
   };
 
+  const openGallery = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        "Permissão negada.",
+        "Precisamos de acesso a sua galeria de fotos.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsMultipleSelection: false,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   const tirarFoto = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
 
@@ -124,13 +147,16 @@ export default function Abastecer() {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
       quality: 0.7,
     });
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const removeFoto = () => {
+    setImage(null);
   };
 
   const enviaAbastec = async () => {
@@ -160,6 +186,12 @@ export default function Abastecer() {
     }
 
     try {
+      let linkFoto = null;
+
+      if (image) {
+        linkFoto = await uploadCloudinary(image, "abastecimentos_upload");
+      }
+
       let dataFinalEnvio = undefined;
 
       if (data.length === 10 && horario.length === 5) {
@@ -181,12 +213,14 @@ export default function Abastecer() {
         total: parseFloat(totalLitro),
         posto,
         dataFinal: dataFinalEnvio,
-        foto: image || null,
+        foto: linkFoto,
       });
 
       setModalSucesso(true);
       setMessageModal("Abastecimento registrado com sucesso.");
       setModal(true);
+
+      setImage(null);
     } catch (error) {
       setModalSucesso(false);
       setMessageModal("Não foi possível regristar abastecimento.");
@@ -388,15 +422,35 @@ export default function Abastecer() {
           onChangeText={setPosto}
         />
 
-        <Text style={styles.label}>Foto do painel</Text>
-        <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
-          <Text style={styles.botaoFotoTexto}>
-            {image ? "Trocar foto" : "Tirar foto"}
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.label}>Foto</Text>
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
+              <Text style={styles.botaoFotoTexto}>Câmera</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.metade}>
+            <TouchableOpacity style={styles.botaoFoto} onPress={openGallery}>
+              <Text style={styles.botaoFotoTexto}>Galeria</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {image && (
-          <Image source={{ uri: image }} style={styles.preview}></Image>
+          <View
+            style={[
+              styles.fotoContainer,
+              { alignSelf: "flex-start", marginBottom: 20 },
+            ]}
+          >
+            <Image source={{ uri: image }} style={styles.fotoPreview} />
+            <TouchableOpacity
+              style={styles.botaoRemoverFoto}
+              onPress={removeFoto}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>X</Text>
+            </TouchableOpacity>
+          </View>
         )}
 
         <TouchableOpacity style={styles.botao} onPress={enviaAbastec}>
@@ -520,6 +574,31 @@ const styles = StyleSheet.create({
   },
   metade: {
     flex: 1,
+  },
+  fotoContainer: {
+    position: "relative",
+    marginRight: 12,
+    marginTop: 8,
+  },
+  fotoPreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  botaoRemoverFoto: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: "#e11d48",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   inputDesabilitado: {
     backgroundColor: "#e9e9e9",
