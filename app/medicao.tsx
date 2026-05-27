@@ -1,9 +1,9 @@
-// import * as ImagePicker from "expo-image-picker";
+import * as ImagePicker from "expo-image-picker";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
-//   Alert,
-//   Image,
+  Alert,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -16,17 +16,20 @@ import {
 } from "react-native";
 
 import { api } from "@/services/api";
+import { uploadCloudinary } from "@/services/cloudinary";
 
 export default function Medicao() {
-  const [rodovia, setRodovia] = useState('');
-  const [sentido, setSentido] = useState('');
-  const [kmIni, setKmIni] = useState('');
-  const [kmFim, setKmFim] = useState('');
-  const [extensao, setExtensao] = useState('');
-  const [largura, setLargura] = useState('');
-  const [faixa, setFaixa] = useState('');
-  const [area, setArea] = useState('');
-  const [nome, setNome] = useState('');
+  const [rodovia, setRodovia] = useState("");
+  const [sentido, setSentido] = useState("");
+  const [kmIni, setKmIni] = useState("");
+  const [kmFim, setKmFim] = useState("");
+  const [extensao, setExtensao] = useState("");
+  const [largura, setLargura] = useState("");
+  const [faixa, setFaixa] = useState("");
+  const [area, setArea] = useState("");
+  const [nome, setNome] = useState("");
+  const [obs, setObs] = useState("");
+  const [fotos, setFotos] = useState<string[]>([]);
 
   const [data, setData] = useState("");
 
@@ -34,9 +37,7 @@ export default function Medicao() {
   const [modal, setModal] = useState(false);
   const [modalSucesso, setModalSucesso] = useState(true);
   const [messageModal, setMessageModal] = useState("");
-  const [placaModal, setPlacaModal] = useState(false);
   const router = useRouter();
-  const placaRef = useRef<TextInput>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -56,80 +57,126 @@ export default function Medicao() {
     setData(cleaned);
   };
 
-//   const tirarFoto = async () => {
-//     const permission = await ImagePicker.requestCameraPermissionsAsync();
+  const openGallery = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-//     if (!permission.granted) {
-//       Alert.alert("Permissão negada.", "Habilite o acesso a câmera.");
-//       return;
-//     }
+    if (!permission.granted) {
+      Alert.alert(
+        "Permissão negada.",
+        "Precisamos do acesso a sua galeria de fotos.",
+      );
+      return;
+    }
 
-//     const result = await ImagePicker.launchCameraAsync({
-//       allowsEditing: true,
-//       quality: 0.7,
-//     });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 0.7,
+    });
 
-//     if (!result.canceled) {
-//       setImage(result.assets[0].uri);
-//     }
-//   };
+    if (!result.canceled) {
+      const novasFotos = result.assets.map((asset) => asset.uri);
+      setFotos((prevFotos) => [...prevFotos, ...novasFotos]);
+    }
+  };
+
+  const tirarFoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permissão negada.", "Habilite o acesso a câmera.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setFotos((prevFotos) => [...prevFotos, result.assets[0].uri]);
+    }
+  };
+
+  const removeFoto = (indexRemove: number) => {
+    setFotos((prevFotos) =>
+      prevFotos.filter((_, index) => index !== indexRemove),
+    );
+  };
 
   const handleConvertNumber = (valor: string) => {
     if (!valor) return 0;
 
-    return parseFloat(valor.replace(",",".")) || 0;
-  }
+    return parseFloat(valor.replace(",", ".")) || 0;
+  };
 
   useEffect(() => {
     const numKmini = handleConvertNumber(kmIni);
     const numKmfim = handleConvertNumber(kmFim);
-    const numLarg = handleConvertNumber(largura);  
+    const numLarg = handleConvertNumber(largura);
 
-    if (numKmini > 0 && numKmfim > 0){
-        const resultExt = Math.abs(numKmfim - numKmini);
-        setExtensao(resultExt.toFixed(2).replace(".",","));
+    if (numKmini > 0 && numKmfim > 0) {
+      const resultExt = Math.abs(numKmfim - numKmini);
+      setExtensao(resultExt.toFixed(2).replace(".", ","));
 
-        if (numLarg > 0) {
-            const resultArea = resultExt * numLarg;
-            setArea(resultArea.toFixed(2).replace(".",","));
-        }else {
-            setArea('');
-        }
-    }else{
-        setExtensao('');
-        setArea('');
+      if (numLarg > 0) {
+        const resultArea = resultExt * numLarg;
+        setArea(resultArea.toFixed(2).replace(".", ","));
+      } else {
+        setArea("");
+      }
+    } else {
+      setExtensao("");
+      setArea("");
     }
-}, [kmIni, kmFim, largura]);
+  }, [kmIni, kmFim, largura]);
 
   const enviaMedicao = async () => {
-  
-  
+    if (
+      !data ||
+      !nome ||
+      !rodovia ||
+      !sentido ||
+      !kmIni ||
+      !kmFim ||
+      !extensao ||
+      !largura ||
+      !faixa ||
+      !area
+    ) {
+      setModalSucesso(false);
+      setMessageModal("Por favor, preencha todos os campos!");
+      setModal(true);
+      return;
+    }
+
     try {
+      const linksFotos = await Promise.all(
+        fotos.map(async (uri) => await uploadCloudinary(uri, "medicao_upload")),
+      );
 
-    //   await api.registraAbastec({
-    //     placa,
-    //     marca,
-    //     modelo,
-    //     km: km || "0",
-    //     horimetro: horimetro || "0",
-    //     operador: nome,
-
-    //     litros: litrosNum,
-    //     preco: precoNum,
-    //     total: parseFloat(totalLitro),
-    //     posto,
-    //     dataFinal: dataFinalEnvio,
-    //     foto: image || null,
-    //   });
+      await api.registraMedicao({
+        dataMedicao: data,
+        apontador: nome,
+        rodovia,
+        sentido,
+        kmIni: parseFloat(kmIni),
+        kmFim: parseFloat(kmFim),
+        extensao: parseFloat(extensao),
+        largura: parseFloat(largura),
+        faixa,
+        areaTotal: parseFloat(area),
+        observacoes: obs,
+        foto: linksFotos,
+      });
 
       setModalSucesso(true);
-      setMessageModal("Abastecimento registrado com sucesso.");
+      setMessageModal("Medição registrada com sucesso.");
       setModal(true);
     } catch (error) {
       setModalSucesso(false);
-      setMessageModal("Não foi possível regristar abastecimento.");
+      setMessageModal("Não foi possível regristar a medição.");
       setModal(true);
-      console.error("Erro ao registrar abastecimento:", error);
+      console.error("Erro ao registrar medição:", error);
     }
   };
 
@@ -278,6 +325,48 @@ export default function Medicao() {
             </View>
           </View>
 
+          <Text style={styles.label}>Observações</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Usina/Espessura/Camada"
+            value={obs}
+            editable
+            onChangeText={setObs}
+          />
+
+          <Text style={styles.label}>Fotos da Obra</Text>
+          <View style={styles.linha}>
+            <View style={styles.metade}>
+              <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
+                <Text style={styles.botaoFotoTexto}>Câmera</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.metade}>
+              <TouchableOpacity style={styles.botaoFoto} onPress={openGallery}>
+                <Text style={styles.botaoFotoTexto}>Galeria</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {fotos.length > 0 && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginBottom: 20 }}
+            >
+              {fotos.map((uri, index) => (
+                <View key={index} style={styles.fotoContainer}>
+                  <Image source={{ uri }} style={styles.fotoPreview}></Image>
+                  <TouchableOpacity
+                    style={styles.botaoRemoverFoto}
+                    onPress={() => removeFoto(index)}
+                  >
+                    <Text style={{ color: "#fff", fontWeight: "bold" }}>X</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          )}
 
           <TouchableOpacity style={styles.botao} onPress={enviaMedicao}>
             <Text style={styles.botaoTexto}>Confirmar</Text>
@@ -384,6 +473,31 @@ const styles = StyleSheet.create({
   },
   metade: {
     flex: 1,
+  },
+  fotoContainer: {
+    position: "relative",
+    marginRight: 12,
+    marginTop: 8,
+  },
+  fotoPreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  botaoRemoverFoto: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: "#e11d48",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   botaoFoto: {
     backgroundColor: "#fff",
