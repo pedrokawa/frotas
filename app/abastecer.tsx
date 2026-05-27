@@ -4,18 +4,17 @@ import { useCallback, useRef, useState } from "react";
 import {
   Alert,
   Image,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 import { api } from "@/services/api";
+
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Abastecer() {
   const [placa, setPlaca] = useState("");
@@ -200,212 +199,210 @@ export default function Abastecer() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <KeyboardAwareScrollView
+        style={{ flex: 1, backgroundColor: "#f0f4ff" }}
+        contentContainerStyle={styles.container}
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+        // extraScrollHeight={20}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+        <TouchableOpacity
+          style={styles.botaoVoltar}
+          onPress={() => router.back()}
         >
+          <Text style={styles.label}>Voltar</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.titulo}>Abastecimento</Text>
+
+        <Text style={styles.label}>Placa do veículo</Text>
+        <TextInput
+          ref={placaRef}
+          style={styles.input}
+          placeholder="Ex: ABC-1234"
+          value={placa}
+          onChangeText={(text) => {
+            setPlaca(text);
+            setPlacaValida(false);
+            setMarca("");
+            setModelo("");
+          }}
+          onEndEditing={(e) => buscaVeiculo(e.nativeEvent.text)}
+          autoCapitalize="characters"
+        />
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Marca</Text>
+            <TextInput
+              style={[styles.input, styles.inputDesabilitado]}
+              placeholder="Auto preenchido"
+              value={marca}
+              editable={false}
+              onChangeText={setMarca}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Modelo</Text>
+            <TextInput
+              style={[styles.input, styles.inputDesabilitado]}
+              placeholder="Auto preenchido"
+              value={modelo}
+              editable={false}
+              onChangeText={setModelo}
+            />
+          </View>
+        </View>
+
+        <Text style={styles.label}>Medição</Text>
+        <View style={styles.tabs}>
           <TouchableOpacity
-            style={styles.botaoVoltar}
-            onPress={() => router.back()}
-          >
-            <Text style={styles.label}>Voltar</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.titulo}>Abastecimento</Text>
-
-          <Text style={styles.label}>Placa do veículo</Text>
-          <TextInput
-            ref={placaRef}
-            style={styles.input}
-            placeholder="Ex: ABC-1234"
-            value={placa}
-            onChangeText={(text) => {
-              setPlaca(text);
-              setPlacaValida(false);
-              setMarca("");
-              setModelo("");
+            style={[styles.tab, tipoMedi === "km" && styles.tabAtivo]}
+            onPress={() => {
+              setTipoMedi("km");
+              setHorimetro("");
             }}
-            onEndEditing={(e) => buscaVeiculo(e.nativeEvent.text)}
-            autoCapitalize="characters"
-          />
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Marca</Text>
-              <TextInput
-                style={[styles.input, styles.inputDesabilitado]}
-                placeholder="Auto preenchido"
-                value={marca}
-                editable={false}
-                onChangeText={setMarca}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Modelo</Text>
-              <TextInput
-                style={[styles.input, styles.inputDesabilitado]}
-                placeholder="Auto preenchido"
-                value={modelo}
-                editable={false}
-                onChangeText={setModelo}
-              />
-            </View>
-          </View>
-
-          <Text style={styles.label}>Medição</Text>
-          <View style={styles.tabs}>
-            <TouchableOpacity
-              style={[styles.tab, tipoMedi === "km" && styles.tabAtivo]}
-              onPress={() => {
-                setTipoMedi("km");
-                setHorimetro("");
-              }}
+          >
+            <Text
+              style={[
+                styles.tabTexto,
+                tipoMedi === "km" && styles.tabTextoAtivo,
+              ]}
             >
-              <Text
-                style={[
-                  styles.tabTexto,
-                  tipoMedi === "km" && styles.tabTextoAtivo,
-                ]}
-              >
-                KM
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.tab, tipoMedi === "horimetro" && styles.tabAtivo]}
-              onPress={() => {
-                setTipoMedi("horimetro");
-                setKm("");
-              }}
-            >
-              <Text
-                style={[
-                  styles.tabTexto,
-                  tipoMedi === "horimetro" && styles.tabTextoAtivo,
-                ]}
-              >
-                Horímetro
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text style={styles.label}>
-            {tipoMedi === "km" ? "KM do veículo" : "Horímetro (horas)"}
-          </Text>
-
-          <TextInput
-            style={[styles.input, !placaValida && styles.inputDesabilitado]}
-            placeholder={tipoMedi === "km" ? "Ex: 55000" : "Ex: 1250"}
-            value={tipoMedi === "km" ? km : horimetro}
-            keyboardType="numeric"
-            editable={placaValida}
-            onChangeText={tipoMedi === "km" ? setKm : setHorimetro}
-          />
-
-          <Text style={styles.label}>Operador</Text>
-          <TextInput
-            style={[styles.input, !placaValida && styles.inputDesabilitado]}
-            editable={placaValida}
-            placeholder="Nome do operador"
-            value={nome}
-            onChangeText={setNome}
-          />
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Litros</Text>
-              <TextInput
-                style={[styles.input, !placaValida && styles.inputDesabilitado]}
-                editable={placaValida}
-                placeholder="Ex: 50"
-                keyboardType="numeric"
-                value={litros}
-                onChangeText={setLitros}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Preço</Text>
-              <TextInput
-                style={[styles.input, !placaValida && styles.inputDesabilitado]}
-                editable={placaValida}
-                placeholder="Preço/litro"
-                keyboardType="numeric"
-                value={preco}
-                onChangeText={setPreco}
-              />
-            </View>
-          </View>
-
-          <Text style={styles.label}>Total</Text>
-          <TextInput
-            style={[styles.input, styles.inputDesabilitado]}
-            placeholder="Total"
-            value={totalLitro ? `R$ ${totalLitro}` : ""}
-            editable={false}
-            // value={total}
-            // onChangeText={setTotal}
-          />
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Data</Text>
-              <TextInput
-                style={[styles.input, !placaValida && styles.inputDesabilitado]}
-                editable={placaValida}
-                placeholder="DD/MM/AAAA"
-                keyboardType="numeric"
-                maxLength={10}
-                value={data}
-                onChangeText={maskData}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Horário</Text>
-              <TextInput
-                style={[styles.input, !placaValida && styles.inputDesabilitado]}
-                editable={placaValida}
-                placeholder="HH:MM"
-                keyboardType="numeric"
-                maxLength={5}
-                value={horario}
-                onChangeText={maskHorario}
-              />
-            </View>
-          </View>
-
-          <Text style={styles.label}>Posto</Text>
-          <TextInput
-            style={[styles.input, !placaValida && styles.inputDesabilitado]}
-            editable={placaValida}
-            placeholder="Ex: Posto Shell Centro"
-            value={posto}
-            onChangeText={setPosto}
-          />
-
-          <Text style={styles.label}>Foto do painel</Text>
-          <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
-            <Text style={styles.botaoFotoTexto}>
-              {image ? "Trocar foto" : "Tirar foto"}
+              KM
             </Text>
           </TouchableOpacity>
 
-          {image && (
-            <Image source={{ uri: image }} style={styles.preview}></Image>
-          )}
-
-          <TouchableOpacity style={styles.botao} onPress={enviaAbastec}>
-            <Text style={styles.botaoTexto}>Confirmar</Text>
+          <TouchableOpacity
+            style={[styles.tab, tipoMedi === "horimetro" && styles.tabAtivo]}
+            onPress={() => {
+              setTipoMedi("horimetro");
+              setKm("");
+            }}
+          >
+            <Text
+              style={[
+                styles.tabTexto,
+                tipoMedi === "horimetro" && styles.tabTextoAtivo,
+              ]}
+            >
+              Horímetro
+            </Text>
           </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </View>
+
+        <Text style={styles.label}>
+          {tipoMedi === "km" ? "KM do veículo" : "Horímetro (horas)"}
+        </Text>
+
+        <TextInput
+          style={[styles.input, !placaValida && styles.inputDesabilitado]}
+          placeholder={tipoMedi === "km" ? "Ex: 55000" : "Ex: 1250"}
+          value={tipoMedi === "km" ? km : horimetro}
+          keyboardType="numeric"
+          editable={placaValida}
+          onChangeText={tipoMedi === "km" ? setKm : setHorimetro}
+        />
+
+        <Text style={styles.label}>Operador</Text>
+        <TextInput
+          style={[styles.input, !placaValida && styles.inputDesabilitado]}
+          editable={placaValida}
+          placeholder="Nome do operador"
+          value={nome}
+          onChangeText={setNome}
+        />
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Litros</Text>
+            <TextInput
+              style={[styles.input, !placaValida && styles.inputDesabilitado]}
+              editable={placaValida}
+              placeholder="Ex: 50"
+              keyboardType="numeric"
+              value={litros}
+              onChangeText={setLitros}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Preço</Text>
+            <TextInput
+              style={[styles.input, !placaValida && styles.inputDesabilitado]}
+              editable={placaValida}
+              placeholder="Preço/litro"
+              keyboardType="numeric"
+              value={preco}
+              onChangeText={setPreco}
+            />
+          </View>
+        </View>
+
+        <Text style={styles.label}>Total</Text>
+        <TextInput
+          style={[styles.input, styles.inputDesabilitado]}
+          placeholder="Total"
+          value={totalLitro ? `R$ ${totalLitro}` : ""}
+          editable={false}
+          // value={total}
+          // onChangeText={setTotal}
+        />
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Data</Text>
+            <TextInput
+              style={[styles.input, !placaValida && styles.inputDesabilitado]}
+              editable={placaValida}
+              placeholder="DD/MM/AAAA"
+              keyboardType="numeric"
+              maxLength={10}
+              value={data}
+              onChangeText={maskData}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Horário</Text>
+            <TextInput
+              style={[styles.input, !placaValida && styles.inputDesabilitado]}
+              editable={placaValida}
+              placeholder="HH:MM"
+              keyboardType="numeric"
+              maxLength={5}
+              value={horario}
+              onChangeText={maskHorario}
+            />
+          </View>
+        </View>
+
+        <Text style={styles.label}>Posto</Text>
+        <TextInput
+          style={[styles.input, !placaValida && styles.inputDesabilitado]}
+          editable={placaValida}
+          placeholder="Ex: Posto Shell Centro"
+          value={posto}
+          onChangeText={setPosto}
+        />
+
+        <Text style={styles.label}>Foto do painel</Text>
+        <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
+          <Text style={styles.botaoFotoTexto}>
+            {image ? "Trocar foto" : "Tirar foto"}
+          </Text>
+        </TouchableOpacity>
+
+        {image && (
+          <Image source={{ uri: image }} style={styles.preview}></Image>
+        )}
+
+        <TouchableOpacity style={styles.botao} onPress={enviaAbastec}>
+          <Text style={styles.botaoTexto}>Confirmar</Text>
+        </TouchableOpacity>
+      </KeyboardAwareScrollView>
 
       <Modal
         animationType="fade"

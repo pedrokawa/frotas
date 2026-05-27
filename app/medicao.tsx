@@ -4,9 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   Image,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +15,7 @@ import {
 
 import { api } from "@/services/api";
 import { uploadCloudinary } from "@/services/cloudinary";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Medicao() {
   const [rodovia, setRodovia] = useState("");
@@ -184,195 +183,193 @@ export default function Medicao() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <KeyboardAwareScrollView
+        style={{ flex: 1, backgroundColor: "#f0f4ff" }}
+        contentContainerStyle={styles.container}
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+        // extraScrollHeight={20}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+        <TouchableOpacity
+          style={styles.botaoVoltar}
+          onPress={() => router.back()}
         >
-          <TouchableOpacity
-            style={styles.botaoVoltar}
-            onPress={() => router.back()}
+          <Text style={styles.label}>Voltar</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.titulo}>Medição</Text>
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Data da Medição</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="DD/MM/AAAA"
+              value={data}
+              keyboardType="numeric"
+              editable
+              onChangeText={maskData}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Apontador</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nome"
+              value={nome}
+              editable
+              onChangeText={setNome}
+            />
+          </View>
+        </View>
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Rodovia</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Rodovia"
+              value={rodovia}
+              editable
+              onChangeText={setRodovia}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Sentido</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="S/N DIR ESQ"
+              value={sentido}
+              editable
+              onChangeText={setSentido}
+            />
+          </View>
+        </View>
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Km Inicial</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="100.000"
+              value={kmIni}
+              keyboardType="numeric"
+              editable
+              onChangeText={setKmIni}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Km Final</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="200.000"
+              value={kmFim}
+              keyboardType="numeric"
+              editable
+              onChangeText={setKmFim}
+            />
+          </View>
+        </View>
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Extensão (m²)</Text>
+            <TextInput
+              style={styles.inputDesabilitado}
+              placeholder="100.000"
+              value={extensao}
+              editable={false}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Largura</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="2,50"
+              value={largura}
+              editable
+              keyboardType="numeric"
+              onChangeText={setLargura}
+            />
+          </View>
+        </View>
+
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <Text style={styles.label}>Faixa</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="1/2/3 ACOST"
+              value={faixa}
+              editable
+              onChangeText={setFaixa}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Área Total (m²)</Text>
+            <TextInput
+              style={styles.inputDesabilitado}
+              placeholder="2.000"
+              value={area}
+              editable={false}
+              // onChangeText={setArea}
+            />
+          </View>
+        </View>
+
+        <Text style={styles.label}>Observações</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Usina/Espessura/Camada"
+          value={obs}
+          editable
+          onChangeText={setObs}
+        />
+
+        <Text style={styles.label}>Fotos da Obra</Text>
+        <View style={styles.linha}>
+          <View style={styles.metade}>
+            <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
+              <Text style={styles.botaoFotoTexto}>Câmera</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.metade}>
+            <TouchableOpacity style={styles.botaoFoto} onPress={openGallery}>
+              <Text style={styles.botaoFotoTexto}>Galeria</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {fotos.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ marginBottom: 20 }}
           >
-            <Text style={styles.label}>Voltar</Text>
-          </TouchableOpacity>
+            {fotos.map((uri, index) => (
+              <View key={index} style={styles.fotoContainer}>
+                <Image source={{ uri }} style={styles.fotoPreview}></Image>
+                <TouchableOpacity
+                  style={styles.botaoRemoverFoto}
+                  onPress={() => removeFoto(index)}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "bold" }}>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        )}
 
-          <Text style={styles.titulo}>Medição</Text>
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Data da Medição</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="DD/MM/AAAA"
-                value={data}
-                keyboardType="numeric"
-                editable
-                onChangeText={maskData}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Apontador</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nome"
-                value={nome}
-                editable
-                onChangeText={setNome}
-              />
-            </View>
-          </View>
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Rodovia</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Rodovia"
-                value={rodovia}
-                editable
-                onChangeText={setRodovia}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Sentido</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="S/N DIR ESQ"
-                value={sentido}
-                editable
-                onChangeText={setSentido}
-              />
-            </View>
-          </View>
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Km Inicial</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="100.000"
-                value={kmIni}
-                keyboardType="numeric"
-                editable
-                onChangeText={setKmIni}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Km Final</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="200.000"
-                value={kmFim}
-                keyboardType="numeric"
-                editable
-                onChangeText={setKmFim}
-              />
-            </View>
-          </View>
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Extensão (m²)</Text>
-              <TextInput
-                style={styles.inputDesabilitado}
-                placeholder="100.000"
-                value={extensao}
-                editable={false}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Largura</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="2,50"
-                value={largura}
-                editable
-                keyboardType="numeric"
-                onChangeText={setLargura}
-              />
-            </View>
-          </View>
-
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <Text style={styles.label}>Faixa</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="1/2/3 ACOST"
-                value={faixa}
-                editable
-                onChangeText={setFaixa}
-              />
-            </View>
-
-            <View style={styles.metade}>
-              <Text style={styles.label}>Área Total (m²)</Text>
-              <TextInput
-                style={styles.inputDesabilitado}
-                placeholder="2.000"
-                value={area}
-                editable={false}
-                // onChangeText={setArea}
-              />
-            </View>
-          </View>
-
-          <Text style={styles.label}>Observações</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Usina/Espessura/Camada"
-            value={obs}
-            editable
-            onChangeText={setObs}
-          />
-
-          <Text style={styles.label}>Fotos da Obra</Text>
-          <View style={styles.linha}>
-            <View style={styles.metade}>
-              <TouchableOpacity style={styles.botaoFoto} onPress={tirarFoto}>
-                <Text style={styles.botaoFotoTexto}>Câmera</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.metade}>
-              <TouchableOpacity style={styles.botaoFoto} onPress={openGallery}>
-                <Text style={styles.botaoFotoTexto}>Galeria</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {fotos.length > 0 && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 20 }}
-            >
-              {fotos.map((uri, index) => (
-                <View key={index} style={styles.fotoContainer}>
-                  <Image source={{ uri }} style={styles.fotoPreview}></Image>
-                  <TouchableOpacity
-                    style={styles.botaoRemoverFoto}
-                    onPress={() => removeFoto(index)}
-                  >
-                    <Text style={{ color: "#fff", fontWeight: "bold" }}>X</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
-          )}
-
-          <TouchableOpacity style={styles.botao} onPress={enviaMedicao}>
-            <Text style={styles.botaoTexto}>Confirmar</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <TouchableOpacity style={styles.botao} onPress={enviaMedicao}>
+          <Text style={styles.botaoTexto}>Confirmar</Text>
+        </TouchableOpacity>
+      </KeyboardAwareScrollView>
 
       <Modal
         animationType="fade"

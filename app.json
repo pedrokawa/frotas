@@ -18,7 +18,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "frotas.abastecimento"
+      "package": "frotas.abastecimento",
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "output": "static",
