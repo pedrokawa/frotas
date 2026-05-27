@@ -36,7 +36,7 @@ export const api = {
     if (!response.ok) throw new Error("Erro ao buscar abastecimentos.");
     return response.json();
   },
-  
+
   buscaUltimoAbastec: async () => {
     const response = await fetch(`${BASE_URL}/api/relatorio/abastecimento`);
 
@@ -78,32 +78,31 @@ export const api = {
 
   //medicao
   registraMedicao: async (dados: {
-            dataMedicao: string,
-            apontador: string, 
-            rodovia: string,
-            sentido: string,
-            kmIni: number,
-            kmFim: number,
-            extensao: number,
-            largura: number,
-            faixa: string,
-            areaTotal: number,
-            observacoes: string,
-            foto: string,
+    dataMedicao: string;
+    apontador: string;
+    rodovia: string;
+    sentido: string;
+    kmIni: number;
+    kmFim: number;
+    extensao: number;
+    largura: number;
+    faixa: string;
+    areaTotal: number;
+    observacoes: string;
+    foto: string[];
   }) => {
     const response = await fetch(`${BASE_URL}/api/medicao`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
       body: JSON.stringify(dados),
     });
-    
+
     if (!response.ok) throw new Error("Erro ao registrar medição.");
     return response.json();
   },
-
 
   //login
   login: async (user: string, password: string) => {
