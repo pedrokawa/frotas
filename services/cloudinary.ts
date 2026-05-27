@@ -1,4 +1,4 @@
-export const Cloudinary = async (uri: string, presetName: string) => {
+export const uploadCloudinary = async (uri: string, presetName: string) => {
   const data = new FormData();
 
   data.append("file", {
