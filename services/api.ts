@@ -90,6 +90,7 @@ export const api = {
     areaTotal: number;
     observacoes: string;
     foto: string[];
+    espessura?: number;
   }) => {
     const response = await fetch(`${BASE_URL}/api/medicao`, {
       method: "POST",
@@ -100,7 +101,11 @@ export const api = {
       body: JSON.stringify(dados),
     });
 
-    if (!response.ok) throw new Error("Erro ao registrar medição.");
+    if (!response.ok) {
+      const erroRealDoBackend = await response.text();
+      console.log("❌ REJEIÇÃO DO BACKEND (Medição):", erroRealDoBackend);
+      throw new Error("Erro ao registrar medição.");
+    }
     return response.json();
   },
 
