@@ -130,7 +130,6 @@ export default function Medicao() {
     } else {
       setExtensao("");
       setArea("");
-      setEspessura("");
     }
   }, [kmIni, kmFim, largura]);
 
@@ -155,25 +154,37 @@ export default function Medicao() {
       return;
     }
 
+    if (data.length !== 10) {
+      setModalSucesso(false);
+      setMessageModal("Data deve estar no formato DD/MM/AAAA.");
+      setModal(true);
+      return;
+    }
+
     setLoading(true);
 
     try {
+      const parteData = data.split("/");
+      const dataFormatada = new Date(
+        `${parteData[2]}-${parteData[1]}-${parteData[0]}T12:00:00Z`,
+      ).toISOString();
+
       const linksFotos = await Promise.all(
         fotos.map(async (uri) => await uploadCloudinary(uri, "medicao_upload")),
       );
 
       await api.registraMedicao({
-        dataMedicao: data,
+        dataMedicao: dataFormatada,
         apontador: nome,
         rodovia,
         sentido,
-        kmIni: parseFloat(kmIni),
-        kmFim: parseFloat(kmFim),
-        extensao: parseFloat(extensao),
-        largura: parseFloat(largura),
-        espessura: parseFloat(espessura) || 0,
+        kmIni: handleConvertNumber(kmIni),
+        kmFim: handleConvertNumber(kmFim),
+        extensao: handleConvertNumber(extensao),
+        largura: handleConvertNumber(largura),
+        espessura: handleConvertNumber(espessura),
         faixa,
-        areaTotal: parseFloat(area),
+        areaTotal: handleConvertNumber(area),
         observacoes: obs,
         foto: linksFotos,
       });
