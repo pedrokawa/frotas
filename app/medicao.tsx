@@ -2,6 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Modal,
@@ -24,11 +25,14 @@ export default function Medicao() {
   const [kmFim, setKmFim] = useState("");
   const [extensao, setExtensao] = useState("");
   const [largura, setLargura] = useState("");
+  const [espessura, setEspessura] = useState("");
   const [faixa, setFaixa] = useState("");
   const [area, setArea] = useState("");
   const [nome, setNome] = useState("");
   const [obs, setObs] = useState("");
   const [fotos, setFotos] = useState<string[]>([]);
+
+  const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState("");
 
@@ -126,6 +130,7 @@ export default function Medicao() {
     } else {
       setExtensao("");
       setArea("");
+      setEspessura("");
     }
   }, [kmIni, kmFim, largura]);
 
@@ -140,13 +145,17 @@ export default function Medicao() {
       !extensao ||
       !largura ||
       !faixa ||
-      !area
+      !area ||
+      !obs ||
+      fotos.length === 0
     ) {
       setModalSucesso(false);
       setMessageModal("Por favor, preencha todos os campos!");
       setModal(true);
       return;
     }
+
+    setLoading(true);
 
     try {
       const linksFotos = await Promise.all(
@@ -162,6 +171,7 @@ export default function Medicao() {
         kmFim: parseFloat(kmFim),
         extensao: parseFloat(extensao),
         largura: parseFloat(largura),
+        espessura: parseFloat(espessura) || 0,
         faixa,
         areaTotal: parseFloat(area),
         observacoes: obs,
@@ -176,6 +186,8 @@ export default function Medicao() {
       setMessageModal("Não foi possível regristar a medição.");
       setModal(true);
       console.error("Erro ao registrar medição:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -275,19 +287,17 @@ export default function Medicao() {
           </View>
         </View>
 
+        <Text style={styles.label}>Extensão (m²)</Text>
+        <TextInput
+          style={styles.inputDesabilitado}
+          placeholder="100.000"
+          value={extensao}
+          editable={false}
+        />
+
         <View style={styles.linha}>
           <View style={styles.metade}>
-            <Text style={styles.label}>Extensão (m²)</Text>
-            <TextInput
-              style={styles.inputDesabilitado}
-              placeholder="100.000"
-              value={extensao}
-              editable={false}
-            />
-          </View>
-
-          <View style={styles.metade}>
-            <Text style={styles.label}>Largura</Text>
+            <Text style={styles.label}>Largura (m)</Text>
             <TextInput
               style={styles.input}
               placeholder="2,50"
@@ -295,6 +305,18 @@ export default function Medicao() {
               editable
               keyboardType="numeric"
               onChangeText={setLargura}
+            />
+          </View>
+
+          <View style={styles.metade}>
+            <Text style={styles.label}>Espessura (cm)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="5,00"
+              value={espessura}
+              editable
+              keyboardType="numeric"
+              onChangeText={setEspessura}
             />
           </View>
         </View>
@@ -366,8 +388,16 @@ export default function Medicao() {
           </ScrollView>
         )}
 
-        <TouchableOpacity style={styles.botao} onPress={enviaMedicao}>
-          <Text style={styles.botaoTexto}>Confirmar</Text>
+        <TouchableOpacity
+          style={[styles.botao, loading && { opacity: 0.7 }]}
+          onPress={enviaMedicao}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.botaoTexto}>Confirmar</Text>
+          )}
         </TouchableOpacity>
       </KeyboardAwareScrollView>
 
